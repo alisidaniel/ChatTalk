@@ -27,6 +27,7 @@ app.get("/messages", async (req, res) => {
 
 app.post("/post/messages", async (req, res) => {
   const response = await message.create({ ...req.body });
+  io.emit("message", req.body);
   res.status(200).send(response);
 });
 
