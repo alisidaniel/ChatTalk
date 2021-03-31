@@ -4,8 +4,8 @@ const connection = require("./db");
 const message = require("./message");
 
 const app = express();
-var http = require("http").Server(app);
-var io = require("socket.io")(http);
+var server = require("http").createServer(app);
+var io = require("socket.io")(server);
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
@@ -39,6 +39,6 @@ io.on("connection", function (socket) {
   });
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on port: ${port}`);
 });
