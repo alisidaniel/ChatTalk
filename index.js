@@ -1,11 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const connection = require("./db");
-const message = require("./message");
+const Message = require("./message");
+const Pusher = require("pusher");
 
 const app = express();
-var server = require("http").createServer(app);
-var io = require("socket.io")(server);
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
@@ -15,31 +14,32 @@ app.set("views", __dirname + "/views");
 app.engine("html", require("ejs").renderFile);
 app.set("view engine", "ejs");
 
+var pusher = new Pusher({
+  appId: "1183849",
+  key: "d6321e7311e7474f0e63",
+  secret: "0a8d61979884dc1e81af",
+  cluster: "eu",
+  useTLS: true,
+});
+
 // just to test the server
 app.get("/", async (req, res) => {
   res.status(200).render("index.html");
 });
 
 app.get("/messages", async (req, res) => {
-  const messages = await message.find();
+  const messages = await Message.find();
   res.status(200).json(messages);
 });
 
 app.post("/post/messages", async (req, res) => {
-  const response = await message.create({ ...req.body });
-  io.emit("message", req.body);
+  const response = await Message.create({ ...req.body });
+  pusher.trigger("channel", "event", {
+    ...response,
+  });
   res.status(200).send(response);
 });
 
-io.on("connection", function (socket) {
-  console.log("A user connected");
-
-  //Whenever someone disconnects this piece of code executed
-  socket.on("disconnect", function () {
-    console.log("A user disconnected");
-  });
-});
-
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server running on port: ${port}`);
 });
