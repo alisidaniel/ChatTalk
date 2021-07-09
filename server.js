@@ -1,3 +1,4 @@
+const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
 const connection = require("./db");
@@ -6,6 +7,9 @@ const Pusher = require("pusher");
 require("dotenv").config();
 
 const app = express();
+const server = http.Server(app);
+
+const port = process.env.PORT || 3338;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -80,6 +84,6 @@ app.post("/post/messages", async (req, res) => {
   res.status(200).send(response);
 });
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log(`Server running on port: ${process.env.PORT}`);
+server.listen(port, () => {
+  console.log(`Server running on port: ${port}`);
 });
