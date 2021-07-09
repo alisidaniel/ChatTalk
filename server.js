@@ -55,7 +55,7 @@ app.post("/pusher/auth", function (req, res) {
 // });
 
 // just to test the server
-app.get("/", async (req, res) => {
+app.get("/chat", async (req, res) => {
   res.status(200).render("index.html");
 });
 
@@ -63,7 +63,7 @@ app.get("/test", async (req, res) => {
   res.status(200).json({ message: "hello" });
 });
 
-app.get("/scanner", async (req, res) => {
+app.get("/", async (req, res) => {
   res.status(200).render("scanner.html");
 });
 
