@@ -3,9 +3,9 @@ const bodyParser = require("body-parser");
 const connection = require("./db");
 const Message = require("./message");
 const Pusher = require("pusher");
+require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -55,6 +55,10 @@ app.get("/", async (req, res) => {
   res.status(200).render("index.html");
 });
 
+app.get("/test", async (req, res) => {
+  res.status(200).json({ message: "hello" });
+});
+
 app.get("/scanner", async (req, res) => {
   res.status(200).render("scanner.html");
 });
@@ -76,6 +80,6 @@ app.post("/post/messages", async (req, res) => {
   res.status(200).send(response);
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port: ${port}`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server running on port: ${process.env.PORT}`);
 });
