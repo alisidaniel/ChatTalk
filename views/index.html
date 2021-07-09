@@ -57,9 +57,11 @@
       Pusher.logToConsole = true;
       var pusher = new Pusher("d6321e7311e7474f0e63", {
         cluster: "eu",
+        encrypted: false,
+        authEndpoint: "/pusher/auth",
       });
 
-      var channel = pusher.subscribe("channel");
+      var channel = pusher.subscribe("private-chat");
       channel.bind("event", function (data) {
         // console.log("hello data:", data);
         // alert(JSON.stringify(data));

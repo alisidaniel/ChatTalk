@@ -22,19 +22,55 @@ var pusher = new Pusher({
   useTLS: true,
 });
 
+app.post("/pusher/auth", function (req, res) {
+  console.log("got into the auth route");
+  const socketId = req.body.socket_id;
+  const channel = req.body.channel_name;
+  const presenceData = {
+    user_id: "unique_user_id",
+    user_info: {
+      name: "Mr Channels",
+      twitter_id: "@pusher",
+    },
+  };
+  const auth = pusher.authenticate(socketId, channel, presenceData);
+  res.send(auth);
+});
+
+// app.post("/pusher/auth", (req, res) => {
+//   console.log("got into the auth");
+//   const socketId = req.body.socket_id;
+//   const channel = req.body.channel_name;
+//   // Retrieve username from session and use as presence channel user_id
+//   const presenceData = {
+//     user_id: "Daniel",
+//   };
+//   const auth = pusher.authenticate(socketId, channel, presenceData);
+//   console.log("Pusher Auth", auth);
+//   res.send(auth);
+// });
+
 // just to test the server
 app.get("/", async (req, res) => {
   res.status(200).render("index.html");
 });
 
+app.get("/scanner", async (req, res) => {
+  res.status(200).render("scanner.html");
+});
+
+app.get("/scanner2", async (req, res) => {
+  res.status(200).render("scanner2.html");
+});
+
 app.get("/messages", async (req, res) => {
-  const messages = await Message.find();
+  const messages = await Message.find({});
   res.status(200).json(messages);
 });
 
 app.post("/post/messages", async (req, res) => {
   const response = await Message.create({ ...req.body });
-  pusher.trigger("channel", "event", {
+  let msg = pusher.trigger("private-chat", "event", {
     ...response,
   });
   res.status(200).send(response);
