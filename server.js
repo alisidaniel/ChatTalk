@@ -1,11 +1,15 @@
+const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
 const connection = require("./db");
 const Message = require("./message");
 const Pusher = require("pusher");
+require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const server = http.Server(app);
+
+const port = process.env.PORT || 3338;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -51,11 +55,15 @@ app.post("/pusher/auth", function (req, res) {
 // });
 
 // just to test the server
-app.get("/", async (req, res) => {
+app.get("/chat", async (req, res) => {
   res.status(200).render("index.html");
 });
 
-app.get("/scanner", async (req, res) => {
+app.get("/test", async (req, res) => {
+  res.status(200).json({ message: "hello" });
+});
+
+app.get("/", async (req, res) => {
   res.status(200).render("scanner.html");
 });
 
@@ -76,6 +84,6 @@ app.post("/post/messages", async (req, res) => {
   res.status(200).send(response);
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on port: ${port}`);
 });
