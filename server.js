@@ -59,6 +59,10 @@ app.get("/chat", async (req, res) => {
   res.status(200).render("index.html");
 });
 
+app.get('/socket/chat', async (req, res) => {
+  res.status(200).render("socket.html");
+})
+
 app.get("/test", async (req, res) => {
   res.status(200).json({ message: "hello" });
 });
