@@ -23,10 +23,12 @@
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"
-      integrity="sha512-oFOCo2/3DtjrJG4N27BjSLQWoiBv171sK6a+JiWjp/7agxC2nCUP358AqzxkBUb5jX8g6CYLPdSKQTbC0weCwA=="
+      src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+      integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
       crossorigin="anonymous"
     ></script>
+    <script defer src="http://localhost:5000/socket.io/socket.io.js"></script>
+    <!-- <script defer src="script.js"></script> -->
   </head>
   <body>
     <div class="jumbotron">
@@ -57,7 +59,10 @@
       </div>
     </div>
     <script>
-      // Enable pusher logging - don't include this in production
+      const socket = io("http://localhost:5000");
+      socket.on("message", function (data) {
+        console.log("hello world", data);
+      });
     </script>
   </body>
 </html>
