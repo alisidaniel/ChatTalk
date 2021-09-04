@@ -28,6 +28,7 @@ var pusher = new Pusher({
 
 app.post("/pusher/auth", function (req, res) {
   console.log("got into the auth route");
+  console.log(req.body.socket_id, req.body.channel_name)
   const socketId = req.body.socket_id;
   const channel = req.body.channel_name;
   const presenceData = {
@@ -81,8 +82,10 @@ app.get("/messages", async (req, res) => {
 });
 
 app.post("/post/messages", async (req, res) => {
+  const {channel, user, message, name} = req.body;
+  console.log(channel, user, message, name);
   const response = await Message.create({ ...req.body });
-  let msg = pusher.trigger("private-chat", "event", {
+  pusher.trigger(`${channel}${user}`, "event", {
     ...response,
   });
   res.status(200).send(response);

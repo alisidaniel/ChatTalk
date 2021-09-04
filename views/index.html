@@ -60,8 +60,9 @@
         encrypted: false,
         authEndpoint: "/pusher/auth",
       });
-
-      var channel = pusher.subscribe("private-chat");
+      const channelId = "5f6df75b88874500b2341182";
+      const user = "5f747168035c9b003b873297";
+      var channel = pusher.subscribe(`${channelId}${user}`);
       channel.bind("event", function (data) {
         // console.log("hello data:", data);
         // alert(JSON.stringify(data));
@@ -69,12 +70,19 @@
           name: data._doc._id,
           message: data._doc.message,
         };
+
+        //listener for chat messages
         addMessages(message);
       });
 
       $(document).ready(function () {
         $("#send").click(function () {
-          sendMessage({ name: $("#name").val(), message: $("#message").val() });
+          sendMessage({
+            name: $("#name").val(),
+            message: $("#message").val(),
+            user: user,
+            channel: channelId,
+          });
         });
         getMessages();
       });
@@ -86,13 +94,14 @@
       }
 
       function getMessages() {
-        $.get("http://localhost:3000/messages", (data) => {
+        $.get("http://localhost:3338/messages", (data) => {
           data.forEach(addMessages);
         });
       }
 
       function sendMessage(message) {
-        $.post("http://localhost:3000/post/messages", message)
+        console.log("hello:", message);
+        $.post("http://localhost:3338/post/messages", message)
           .then((res) => {
             console.log(res);
           })
