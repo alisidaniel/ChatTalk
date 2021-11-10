@@ -56,6 +56,14 @@ app.post("/pusher/auth", function (req, res) {
 // });
 
 // just to test the server
+app.get('/kwivar/channel/chat', async (req, res) => {
+  res.status(200).render('channel.html');
+});
+
+app.get('/kwivar/user/chat', async (req, res) => {
+  res.status(200).render('user.html');
+});
+
 app.get("/chat", async (req, res) => {
   res.status(200).render("index.html");
 });
@@ -75,6 +83,11 @@ app.get("/", async (req, res) => {
 app.get("/scanner2", async (req, res) => {
   res.status(200).render("scanner2.html");
 });
+
+app.get('/stripe', async (req, res) => {
+  res.status(200).render("stripe.html");
+});
+
 
 app.get("/messages", async (req, res) => {
   const messages = await Message.find({});

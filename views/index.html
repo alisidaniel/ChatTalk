@@ -27,6 +27,7 @@
   <body>
     <div class="jumbotron">
       <p>Chat room</p>
+      <p id="state"></p>
       <div>
         <div id="messages"></div>
         <div>
@@ -58,13 +59,21 @@
       var pusher = new Pusher("d6321e7311e7474f0e63", {
         cluster: "eu",
         encrypted: false,
+        forceTLS: true,
         authEndpoint: "/pusher/auth",
       });
+
       const channelId = "5f6df75b88874500b2341182";
       const user = "5f747168035c9b003b873297";
+
+      pusher.connection.bind("state_change", function (states) {
+        // states = {previous: 'oldState', current: 'newState'}
+        $("#state").text("Channels current state is " + states.current);
+      });
+
       var channel = pusher.subscribe(`${channelId}${user}`);
       channel.bind("event", function (data) {
-        // console.log("hello data:", data);
+        console.log("hello data:", data);
         // alert(JSON.stringify(data));
         let message = {
           name: data._doc._id,
@@ -73,6 +82,16 @@
 
         //listener for chat messages
         addMessages(message);
+      });
+
+      pusher.bind("pusher:subscription_succeeded", function (data) {
+        // Yipee!!
+        consoel.log("succeded", data);
+      });
+
+      pusher.bind("pusher:subscription_error", function (error) {
+        // Oh nooooos!
+        console.log("error", error);
       });
 
       $(document).ready(function () {

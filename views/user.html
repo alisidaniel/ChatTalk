@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width initial-scale=1.0" />
+    <meta http-equiv="x-UA-Compatible" content="ie=edge" />
+    <title>ChatTalk</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+      integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+      crossorigin="anonymous"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+      integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+      integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+  </head>
+  <body>
+    <div class="jumbotron">
+      <p>User Chat Room</p>
+      <p id="state"></p>
+      <div>
+        <div id="messages"></div>
+        <div>
+          <!-- <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="name"
+            placeholder="Enter name"
+            required
+          /> -->
+        </div>
+        <div class="mt-2">
+          <input
+            type="text"
+            class="form-control"
+            name="message"
+            id="message"
+            placeholder="Type message..."
+            required
+          />
+        </div>
+        <button class="btn btn-info mt-2" id="send">Send</button>
+      </div>
+    </div>
+    <script>
+      // Enable pusher logging - don't include this in production
+      const token = {
+        key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InNhdmVkQmlsbHMiOnsicGhvbmVOdW1iZXJzIjpbXSwic21hcnROdW1iZXJzIjpbXSwibWV0ZXJOdW1iZXJzIjpbXX0sImRvYiI6IiIsInBob3RvIjoiaHR0cHM6Ly9rd2l2YXJkdW8uczMuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb20va2FsdW5qb2t1MTIzQGdtYWlsLmNvbS9wcm9maWxlLTE2MjY5NjYzMDgxODIuanBnIiwiYnZuIjpudWxsLCJidm5WZXJpZnkiOmZhbHNlLCJhY3RpdmUiOnRydWUsInByZW1pdW0iOmZhbHNlLCJ3aXNoTGlzdCI6W10sImNyZWRpdExldmVsIjoic2lsdmVyIiwiZGVsZXRlZCI6ZmFsc2UsInJlZmVycmVyIjoiS1dWLTkwMTQ5IiwiY29ubmVjdGlvbiI6W10sIndhbGxldEJhbGFuY2UiOjY2NTg0MCwiY3JlZGl0UG9pbnRzIjowLCJfaWQiOiI1ZjczMTM1MmMzMGNlZDAwNGJkYTc0MWUiLCJyZWZlcnJlZCI6W10sImZuYW1lIjoiRGFuaWVsIiwibG5hbWUiOiJBbGlzaSIsImVtYWlsIjoia2FsdW5qb2t1MTIzQGdtYWlsLmNvbSIsInJlZmVyZW5jZSI6IktXVi0yOTM3IiwicGFzc3dvcmQiOiIkMmEkMTAkRDJiRC9wOW5jTnlCVlRud2M3TEY3dVVCeVFHb2VvSUNuNkIvZjhWcHYwMU9oeW5UM0UxRi4iLCJnZW5kZXIiOiJNYWxlIiwicGhvbmUiOjgxMDc2MjE5MzIwMDgsImFkZHJlc3MiOm51bGwsImRldmljZUlkIjpudWxsLCJjcmVhdGVkQXQiOiIyMDIwLTA5LTI5VDEwOjU4OjI2LjMzNloiLCJ1cGRhdGVkQXQiOiIyMDIxLTExLTA3VDAxOjA2OjU4LjQzMloiLCJfX3YiOjAsInNoaXBwaW5nQWRkcmVzcyI6W3siX2lkIjoiNjE0ODUwOTNhZGRjMjAwMTY5Zjk5YmJiIiwibm8iOiIyOSIsInN0cmVldCI6IkFidWphIExhbmUiLCJjaXR5IjoiUG9ydCBIYXJjb3VydCBDaXR5Iiwic3RhdGUiOiJSaXZlcnMgU3RhdGUiLCJjb3VudHJ5IjoiTmlnZXJpYSJ9LHsiX2lkIjoiNjE0ODU4MmZhZGRjMjAwMTY5Zjk5YmJjIiwibm8iOiI5MDAwIiwic3RyZWV0IjoiT2plYnUiLCJjaXR5IjoiUG9ydCBIYXJjb3VydCBDaXR5Iiwic3RhdGUiOiJJbW8iLCJjb3VudHJ5IjoiTmlnZXJpYSJ9LHsiX2lkIjoiNjE0ODU5MjRhZGRjMjAwMTY5Zjk5YmJkIiwibm8iOiI5MDAwIiwic3RyZWV0IjoiVG9tYmlhIiwiY2l0eSI6IlBvcnQgSGFyY291cnQiLCJzdGF0ZSI6IlJpdmVycyBTdGF0ZSIsImNvdW50cnkiOiJOaWdlcmlhIn1dfSwiaWF0IjoxNjM2MzEyOTk1LCJleHAiOjE2Njc4NzA1OTV9.g5qBA8zYhgW5O0FsP_lYlh48cWZ3bLMQRxKcKmexkxQ",
+      };
+
+      Pusher.logToConsole = true;
+      var pusher = new Pusher("d6321e7311e7474f0e63", {
+        cluster: "eu",
+        encrypted: false,
+        // forceTLS: true,
+        authEndpoint:
+          "http://18.224.215.140:7000/api/v1/channelService/chat/pusher/auth",
+        auth: {
+          headers: {
+            Authorization: token.key,
+          },
+        },
+      });
+
+      const channelId = "5f8067d9784367003bb6e303";
+      const user = "5f747168035c9b003b873297";
+
+      pusher.connection.bind("state_change", function (states) {
+        // states = {previous: 'oldState', current: 'newState'}
+        $("#state").text("Channels current state is " + states.current);
+      });
+
+      var channel = pusher.subscribe(`${channelId}${user}`);
+      channel.bind("event", function (data) {
+        let message = {
+          message: data._doc.message,
+        };
+        //listener for chat messages
+        addMessages(message);
+      });
+
+      $(document).ready(function () {
+        $("#send").click(function () {
+          sendMessage({
+            message: $("#message").val(),
+            user: user,
+            channel: channelId,
+            image: null, // optional base64 sstring
+          });
+        });
+        getMessages();
+      });
+
+      // AJAX add message
+      function addMessages(message) {
+        $("#messages").append(`<p> <b>Message</b>: ${message.message} </p>`);
+      }
+
+      // GET MESSAGES
+      function getMessages() {
+        $.ajaxSetup({
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+            Authorization: token.key,
+          },
+        });
+        $.get(
+          `http://18.224.215.140:7000/api/v1/channelService/chat/messages/${channelId}/${user}`,
+          (data) => {
+            data.messages.forEach(addMessages);
+          }
+        );
+      }
+
+      // POST MESSAGE
+      function sendMessage(message) {
+        fetch(
+          "http://18.224.215.140:7000/api/v1/channelService/chat/send/message",
+          {
+            method: "post",
+            headers: {
+              Accept: "application/json, text/plain, */*",
+              "Content-Type": "application/json",
+              Authorization: token.key,
+            },
+            body: JSON.stringify({
+              user: message.user,
+              channel: message.channel,
+              message: message.message,
+              image: message.image,
+            }),
+          }
+        )
+          .then((res) => res.json())
+          .then((res) => console.log(res));
+      }
+    </script>
+  </body>
+</html>
