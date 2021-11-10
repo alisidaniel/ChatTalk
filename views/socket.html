@@ -60,8 +60,12 @@
     </div>
     <script>
       const socket = io("http://localhost:5000");
+      socket.emit("message", { user: "name", id: "60be434f2b994d0660f140ab" });
       socket.on("message", function (data) {
         console.log("hello world", data);
+      });
+      socket.on("user_disconnected", function (data) {
+        console.log(data);
       });
     </script>
   </body>

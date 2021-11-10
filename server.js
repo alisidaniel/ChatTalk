@@ -28,6 +28,7 @@ var pusher = new Pusher({
 
 app.post("/pusher/auth", function (req, res) {
   console.log("got into the auth route");
+  console.log(req.body.socket_id, req.body.channel_name)
   const socketId = req.body.socket_id;
   const channel = req.body.channel_name;
   const presenceData = {
@@ -55,6 +56,14 @@ app.post("/pusher/auth", function (req, res) {
 // });
 
 // just to test the server
+app.get('/kwivar/channel/chat', async (req, res) => {
+  res.status(200).render('channel.html');
+});
+
+app.get('/kwivar/user/chat', async (req, res) => {
+  res.status(200).render('user.html');
+});
+
 app.get("/chat", async (req, res) => {
   res.status(200).render("index.html");
 });
@@ -75,14 +84,21 @@ app.get("/scanner2", async (req, res) => {
   res.status(200).render("scanner2.html");
 });
 
+app.get('/stripe', async (req, res) => {
+  res.status(200).render("stripe.html");
+});
+
+
 app.get("/messages", async (req, res) => {
   const messages = await Message.find({});
   res.status(200).json(messages);
 });
 
 app.post("/post/messages", async (req, res) => {
+  const {channel, user, message, name} = req.body;
+  console.log(channel, user, message, name);
   const response = await Message.create({ ...req.body });
-  let msg = pusher.trigger("private-chat", "event", {
+  pusher.trigger(`${channel}${user}`, "event", {
     ...response,
   });
   res.status(200).send(response);
